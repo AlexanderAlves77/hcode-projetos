@@ -5,28 +5,31 @@ import { PlacesService } from './places.service';
 export class PlacesController {
   constructor(private readonly placesService: PlacesService) {}
 
+  // Cria um novo lugar
   @Post()
   async create(@Body() name: string) {
-    return this.placesService.create(name)
+    return this.placesService.create(name);
   }
 
+  // Retorna todos os lugares
   @Get()
   async findAll() {
-    return this.placesService.findAll()
+    return this.placesService.findAll();
   }
 
+  // Retorna um único lugar
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.placesService.findOne(id)
+    return this.placesService.findOne(id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: number, @Body() name: string) {
-    return this.placesService.update(id, name)
+    return this.placesService.update(id, name);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: number) {
-    return this.placesService.delete(id)
+    return this.placesService.delete(id);
   }
 }
