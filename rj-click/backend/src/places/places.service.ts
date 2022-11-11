@@ -1,29 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreatePlacesDTO } from './dto/create-places.dto';
+import { UpdatePlacesDTO } from './dto/update-places.dto';
 
 @Injectable()
 export class PlacesService {
+  constructor(private readonly prisma: PrismaService)  {}
+
   // Cria os lugares
-  async create(name: string) {
-    return `Lugar ${name['name']} criado com sucesso`;
+  async create(createPlacesDTO: CreatePlacesDTO) {
+    const { name, categoryId } = createPlacesDTO
+    return this.prisma.places.create({
+      data: { name: name, categoryId: Number(categoryId) }
+    })
   }
 
   // Retorna todos os lugares
   async findAll() {
-    return `Retornando todos os lugares`;
+    return this.prisma.places.findMany()
   }
 
   // Retorna um unico lugar
   async findOne(id: number) {
-    return `Retornando o lugar id ${id}`;
+    return this.prisma.places.findUnique({ where: { id: id }})
   }
 
   // Atualiza o nome do lugar
-  async update(id: number, name: string) {
-    return `Retornando os dados do lugar id ${id} atualizados con o novo nome ${name['name']}`;
+  async update(id: number, updatePlacesDTO: UpdatePlacesDTO) {
+    const { name, categoryId } = updatePlacesDTO
+    return this.prisma.places.update({ 
+      where: { id: id },
+      data: { name: name, categoryId: Number(categoryId) }
+    })
   }
 
   // Exclui um lugar
   async delete(id: number) {
-    return `Lugar com id ${id} excluido com sucesso`;
+    return this.prisma.places.delete({ where: { id: id }})
   }
 }

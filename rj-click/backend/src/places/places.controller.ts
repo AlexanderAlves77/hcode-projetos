@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { CreatePlacesDTO } from './dto/create-places.dto';
+import { UpdatePlacesDTO } from './dto/update-places.dto';
 import { PlacesService } from './places.service';
 
 @Controller('places')
@@ -7,8 +9,8 @@ export class PlacesController {
 
   // Cria um novo lugar
   @Post()
-  async create(@Body() name: string) {
-    return this.placesService.create(name);
+  async create(@Body() createPlacesDTO: CreatePlacesDTO) {
+    return this.placesService.create(createPlacesDTO);
   }
 
   // Retorna todos os lugares
@@ -19,17 +21,18 @@ export class PlacesController {
 
   // Retorna um único lugar
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.placesService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() name: string) {
-    return this.placesService.update(id, name);
+  async update(@Param('id', ParseIntPipe) id: number, 
+  @Body() updatePlacesDTO: UpdatePlacesDTO) {
+    return this.placesService.update(id, updatePlacesDTO);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return this.placesService.delete(id);
   }
 }
