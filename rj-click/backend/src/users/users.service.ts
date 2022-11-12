@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsersDTO } from './dto/createUsers.dto';
 import * as bcrypt from "bcrypt";
+import { UpdateUsersDto } from './dto/updateUsers.dto';
+import { users } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -9,8 +11,7 @@ export class UsersService {
 
   async create(createUsersDTO: CreateUsersDTO) {
     const { name, email, password } = createUsersDTO
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
+    const passwordHash = await this.passwordHash(password)
 
     return this.prisma.users.create({
       data: {
@@ -26,14 +27,40 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return `Retornando um único usuário com o id ${id}`
+    return this.prisma.users.findUnique({
+      where: { id: id }
+    })
   }
 
-  async update(id: number, user: string) {
-    return `Retornando usuário atualizado id ${id} e novo nome ${user['user']}`
+  async findByEmail(email: string): Promise<users | undefined> {
+    return this.prisma.users.findUnique({
+      where: { email: email }
+    })
+  }
+
+  async update(id: number, updateUsersDTO: UpdateUsersDto) {
+    const { name, email, password } = updateUsersDTO
+    const passwordHash = await this.passwordHash(password)
+
+    return this.prisma.users.update({
+      where: { id: id },
+      data: {
+        name: name,
+        email: email,
+        password: passwordHash
+      }
+    });
   }
 
   async delete(id: number) {
-    return `Deletando usuário com o id ${id}`
+    return this.prisma.users.delete({
+      where: { id: id }
+    })
+  }
+
+  private async passwordHash(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+    return passwordHash
   }
 }
